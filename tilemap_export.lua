@@ -17,7 +17,7 @@ end
 -- 256 or fewer tiles, and the tiles are 8 x 12.
 local layer = app.activeLayer
 if not layer.isTilemap then
-  app.alert("Layer is not tilemap.") 
+  app.alert("Selected layer is not tilemap.") 
   return
 end
 if #layer.tileset > 256 then
