@@ -49,7 +49,7 @@ local blankRows = 25 - image.bounds.height
 
 -- Present a dialog to the user to find the output filename and
 -- give them a chance to cancel.
-local dialog = Dialog("Export Tilemap as .dat File")
+local dialog = Dialog("Export Tilemap as a .dat File")
 dialog:label{id="lab1",label="",text="Export Tilemap as a .dat file."}
  :file{id = "path", label="Export Path", filename="",open=false,filetypes={"dat"}, save=true, focus=true}
  :separator{}
@@ -87,3 +87,5 @@ end
 
 -- Close the file handler.
 mapFile:close()
+
+app.alert("Tile map exported to " .. dialog.data.path)
