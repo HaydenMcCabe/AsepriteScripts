@@ -39,13 +39,14 @@ if cel == nil then
 end
 
 -- The selected cel is sized as the smallest rectangle
--- that contains all of the non-blank tiles from the
--- upper left corner.
+-- that contains all of the non-blank tiles
 local image = cel.image
 -- Find the number of blank columns and rows
 -- not used by the cel.
-local blankColumns = 50 - image.bounds.width
-local blankRows = 25 - image.bounds.height
+local blankLeadingColumns = cel.position.x / 8
+local blankHeaderRows = cel.position.y / 12
+local blankTrailingColumns = 50 - image.bounds.width - blankLeadingColumns
+local blankFooterRows = 25 - image.bounds.height - blankHeaderRows
 
 -- Present a dialog to the user to find the output filename and
 -- give them a chance to cancel.
@@ -63,25 +64,38 @@ if not dialog.data.ok then return end
 -- Open a handler for the output file.
 local mapFile = io.open(dialog.data.path,"wb")
 
+-- Add the blank header rows
+for _ = 1,(50 * blankHeaderRows) do
+  mapFile:write(string.pack("B", 0))
+end
 -- Iterate through the pixels, adding in zeroes as
 -- right padding for the missing columns.
 local column = 0
 for p in image:pixels() do
+  -- Before "column 0" of the image pixels, insert
+  -- the required 0s for the blank leading columns
+  if column == 0 then
+    for tempVar = 1, blankLeadingColumns do
+      print("Header column: " .. tempVar)
+      mapFile:write(string.pack("B", 0))
+    end
+    column = 0
+  end
+
   -- Insert the uint_8 bits for the tile index
   mapFile:write(string.pack("B", p()))
-  -- Iterate the column count, and insert
-  -- blank columns and reset the column count
-  -- as needed.
+  -- Iterate the column count, insert blank trailing columns
+  -- and reset the column count as needed.
   column = column + 1
   if column == image.bounds.width then
-    for _ = 1, blankColumns do
+    for _ = 1, blankTrailingColumns do
       mapFile:write(string.pack("B", 0))
     end
     column = 0
   end
 end
 -- Add the blank rows at the bottom
-for _ = 1,(50 * blankRows) do
+for _ = 1,(50 * blankFooterRows) do
   mapFile:write(string.pack("B", 0))
 end
 
