@@ -76,7 +76,6 @@ for p in image:pixels() do
   -- the required 0s for the blank leading columns
   if column == 0 then
     for tempVar = 1, blankLeadingColumns do
-      print("Header column: " .. tempVar)
       mapFile:write(string.pack("B", 0))
     end
     column = 0
